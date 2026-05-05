@@ -9,10 +9,29 @@ interface Props {
   streamContent?: string;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function parseMarkdown(text: string): string {
-  return text
-    .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
+  // Extract code blocks before escaping so their content is preserved safely
+  const codeBlocks: string[] = [];
+  const withPlaceholders = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, lang: string, code: string) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push(`<pre><code class="language-${escapeHtml(lang)}">${escapeHtml(code)}</code></pre>`);
+    return `\x00CODE${idx}\x00`;
+  });
+
+  const escaped = escapeHtml(withPlaceholders);
+
+  return escaped
+    .replace(/\x00CODE(\d+)\x00/g, (_m, i: string) => codeBlocks[parseInt(i)] ?? '')
+    .replace(/`([^`]+)`/g, (_m, c: string) => `<code>${escapeHtml(c)}</code>`)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/\n/g, '<br>');
