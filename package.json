@@ -1,0 +1,16 @@
+{
+  "name": "gemini-relay",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace=apps/server\" \"npm run dev --workspace=apps/web\"",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=apps/server && npm run build --workspace=apps/web",
+    "start": "concurrently --kill-others-on-fail \"npm run start --workspace=apps/server\" \"npm run start --workspace=apps/web\"",
+    "install:all": "npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.4.5"
+  }
+}

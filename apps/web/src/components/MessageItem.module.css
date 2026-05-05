@@ -1,0 +1,72 @@
+.message {
+  display: flex;
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+  align-items: flex-start;
+}
+
+.message.user {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  background: var(--bg-tertiary);
+}
+
+.user .avatar {
+  background: var(--accent-light);
+}
+
+.bubble {
+  max-width: 70%;
+  min-width: 2rem;
+}
+
+.user .bubble {
+  background: var(--accent-light);
+  border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
+  padding: 0.625rem 0.875rem;
+}
+
+.message.assistant .bubble {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;
+  padding: 0.625rem 0.875rem;
+}
+
+.content {
+  color: var(--text-primary);
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.content :global(pre) {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+}
+
+.content :global(strong) {
+  font-weight: 600;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--accent);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
