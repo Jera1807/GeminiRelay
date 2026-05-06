@@ -86,7 +86,7 @@ export default function ChatWindow({ conversationId, token: _token, wsClient, ws
           ? msg.event.text
           : (typeof msg.event.content === 'string' ? msg.event.content : null);
         if (eventText !== null) {
-          const isDelta = msg.event.delta !== false;
+          const isDelta = msg.event.delta === true || msg.event.delta === undefined;
           setStreaming(prev => {
             if (!prev) return prev;
             const nextContent = isDelta ? prev.content + eventText : eventText;

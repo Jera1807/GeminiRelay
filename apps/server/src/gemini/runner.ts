@@ -28,9 +28,9 @@ type RawGeminiEvent = GeminiStreamEvent & {
 function normalizeStats(stats: RawGeminiStats): RunStats {
   return {
     durationMs: stats.durationMs ?? stats.duration_ms,
-    inputTokenCount: stats.inputTokenCount ?? stats.input_tokens ?? stats.input_token_count,
-    outputTokenCount: stats.outputTokenCount ?? stats.output_tokens ?? stats.output_token_count,
-    totalTokenCount: stats.totalTokenCount ?? stats.total_tokens ?? stats.total_token_count,
+    inputTokenCount: stats.inputTokenCount ?? stats.input_token_count ?? stats.input_tokens,
+    outputTokenCount: stats.outputTokenCount ?? stats.output_token_count ?? stats.output_tokens,
+    totalTokenCount: stats.totalTokenCount ?? stats.total_token_count ?? stats.total_tokens,
     model: stats.model,
   };
 }
