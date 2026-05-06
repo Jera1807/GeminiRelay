@@ -10,6 +10,7 @@ export interface RunnerEvents {
   error: (err: Error) => void;
 }
 
+// Gemini CLI stream-json stats use snake_case; normalize to RunStats camelCase.
 type RawGeminiStats = RunStats & {
   duration_ms?: number;
   input_tokens?: number;
