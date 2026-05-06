@@ -143,6 +143,7 @@ export function setupWebSocket(server: Server): WebSocketServer {
         });
 
         runner.on('error', (err: Error) => {
+          console.error(`[ws/handler] run ${run.id} error: ${err.message}`);
           activeRunners.delete(run.id);
           finishRun(run.id, 'error');
           send(ws, { type: 'runError', runId: run.id, error: err.message });
