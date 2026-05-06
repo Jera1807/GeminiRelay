@@ -10,6 +10,39 @@ export interface RunnerEvents {
   error: (err: Error) => void;
 }
 
+type RawGeminiStats = RunStats & {
+  duration_ms?: number;
+  input_tokens?: number;
+  output_tokens?: number;
+  total_tokens?: number;
+  total_token_count?: number;
+  input_token_count?: number;
+  output_token_count?: number;
+};
+
+type RawGeminiEvent = GeminiStreamEvent & {
+  content?: string;
+  stats?: RawGeminiStats;
+};
+
+function normalizeStats(stats: RawGeminiStats): RunStats {
+  return {
+    durationMs: stats.durationMs ?? stats.duration_ms,
+    inputTokenCount: stats.inputTokenCount ?? stats.input_tokens ?? stats.input_token_count,
+    outputTokenCount: stats.outputTokenCount ?? stats.output_tokens ?? stats.output_token_count,
+    totalTokenCount: stats.totalTokenCount ?? stats.total_tokens ?? stats.total_token_count,
+    model: stats.model,
+  };
+}
+
+function normalizeGeminiEvent(event: RawGeminiEvent): GeminiStreamEvent {
+  const text = typeof event.text === 'string'
+    ? event.text
+    : (typeof event.content === 'string' ? event.content : undefined);
+  const stats = event.stats ? normalizeStats(event.stats) : undefined;
+  return { ...event, text, stats };
+}
+
 export class GeminiRunner extends EventEmitter {
   private process: ChildProcess | null = null;
   private cancelled = false;
@@ -130,11 +163,12 @@ export class GeminiRunner extends EventEmitter {
   private handleLine(line: string, onStats: (s: RunStats) => void): void {
     if (!line) return;
     try {
-      const parsed = JSON.parse(line) as GeminiStreamEvent;
-      if (parsed.type === 'result' && parsed.stats) {
-        onStats(parsed.stats as RunStats);
+      const parsed = JSON.parse(line) as RawGeminiEvent;
+      const normalized = normalizeGeminiEvent(parsed);
+      if (normalized.type === 'result' && normalized.stats) {
+        onStats(normalized.stats);
       }
-      this.emit('event', parsed);
+      this.emit('event', normalized);
     } catch {
       if (config.geminiDebug) {
         console.debug(`[GeminiRunner] non-JSON stdout: ${line}`);

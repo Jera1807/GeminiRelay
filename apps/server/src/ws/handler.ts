@@ -40,6 +40,12 @@ function send(ws: WebSocket, msg: RunStartedMessage | GeminiEventMessage | LogLi
   }
 }
 
+function getEventText(event: GeminiStreamEvent): string | null {
+  if (typeof event.text === 'string') return event.text;
+  if (typeof event.content === 'string') return event.content;
+  return null;
+}
+
 const SYSTEM_PROMPT = `You are a helpful AI assistant powered by Google Gemini. Be concise and clear in your responses. When showing code, use proper markdown code blocks with language identifiers.`;
 
 function buildPrompt(history: { role: string; content: string }[], userPrompt: string): string {
@@ -115,10 +121,13 @@ export function setupWebSocket(server: Server): WebSocketServer {
 
         runner.on('event', (event: GeminiStreamEvent) => {
           send(ws, { type: 'geminiEvent', runId: run.id, event });
-          if (event.delta && typeof event.text === 'string') {
-            assistantContent += event.text;
-          } else if (!event.delta && typeof event.text === 'string') {
-            assistantContent = event.text;
+          const eventText = getEventText(event);
+          if (eventText !== null) {
+            if (event.delta === false) {
+              assistantContent = eventText;
+            } else {
+              assistantContent += eventText;
+            }
           }
         });
 

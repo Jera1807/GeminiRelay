@@ -82,11 +82,15 @@ export default function ChatWindow({ conversationId, token: _token, wsClient, ws
         setSending(false);
       } else if (msg.type === 'geminiEvent') {
         if (msg.runId !== activeRunId.current) return;
-        if (msg.event.delta && typeof msg.event.text === 'string') {
-          const delta = msg.event.text;
+        const eventText = typeof msg.event.text === 'string'
+          ? msg.event.text
+          : (typeof msg.event.content === 'string' ? msg.event.content : null);
+        if (eventText !== null) {
+          const isDelta = msg.event.delta !== false;
           setStreaming(prev => {
             if (!prev) return prev;
-            const updated = { ...prev, content: prev.content + delta };
+            const nextContent = isDelta ? prev.content + eventText : eventText;
+            const updated = { ...prev, content: nextContent };
             streamingRef.current = updated;
             return updated;
           });

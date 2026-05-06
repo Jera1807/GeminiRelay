@@ -140,6 +140,7 @@ export interface GeminiStreamEvent {
   type: string;
   delta?: boolean;
   text?: string;
+  content?: string;
   stats?: RunStats;
   [key: string]: unknown;
 }
